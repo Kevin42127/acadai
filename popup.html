@@ -18,10 +18,27 @@
 
     <main>
       <div id="mainContent" class="main-content">
+        <section class="function-selector">
+          <label>
+            <span class="material-icons">apps</span>
+            選擇功能
+          </label>
+          <div class="function-buttons">
+            <button class="function-btn active" data-function="outline">
+              <span class="material-icons">description</span>
+              生成大綱
+            </button>
+            <button class="function-btn" data-function="answer">
+              <span class="material-icons">help</span>
+              問題解答
+            </button>
+          </div>
+        </section>
+
         <section class="input-section">
-          <label for="topicInput">
+          <label for="topicInput" id="inputLabel">
             <span class="material-icons">edit</span>
-            學術寫作主題或內容
+            <span id="labelText">學術寫作主題或內容</span>
           </label>
           <textarea id="topicInput" placeholder="請輸入論文、報告或作業主題，或選取網頁文字後點擊「使用選取文字」"></textarea>
           <div class="button-group">
@@ -31,7 +48,7 @@
             </button>
             <button id="generateBtn" class="primary-button">
               <span class="material-icons">auto_awesome</span>
-              生成寫作大綱
+              <span id="generateBtnText">生成寫作大綱</span>
             </button>
           </div>
         </section>
@@ -40,7 +57,7 @@
           <div class="result-header">
             <h2>
               <span class="material-icons">check_circle</span>
-              生成的寫作大綱
+              <span id="resultTitle">生成的寫作大綱</span>
             </h2>
             <button id="copyBtn" class="icon-button" title="複製">
               <span class="material-icons">content_copy</span>
@@ -51,7 +68,7 @@
 
         <div id="loading" class="loading" style="display: none;">
           <div class="spinner"></div>
-          <p>正在生成寫作大綱...</p>
+          <p id="loadingText">正在生成寫作大綱...</p>
         </div>
 
         <div id="error" class="error-message" style="display: none;">

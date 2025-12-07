@@ -11,6 +11,17 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       });
     return true;
   }
+  
+  if (request.action === 'answerQuestion') {
+    answerQuestion(request.prompt)
+      .then(answer => {
+        sendResponse({ answer: answer });
+      })
+      .catch(error => {
+        sendResponse({ error: error.message });
+      });
+    return true;
+  }
 });
 
 async function generateOutline(prompt) {
@@ -32,6 +43,28 @@ async function generateOutline(prompt) {
     return data.outline;
   } catch (error) {
     throw new Error('生成寫作大綱失敗：' + error.message);
+  }
+}
+
+async function answerQuestion(prompt) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/answer-question`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ prompt })
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'API 請求失敗');
+    }
+
+    const data = await response.json();
+    return data.answer;
+  } catch (error) {
+    throw new Error('解答問題失敗：' + error.message);
   }
 }
 

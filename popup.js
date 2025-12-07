@@ -9,7 +9,35 @@ document.addEventListener('DOMContentLoaded', async () => {
   const loadingDiv = document.getElementById('loading');
   const errorDiv = document.getElementById('error');
   const errorText = document.getElementById('errorText');
+  const functionButtons = document.querySelectorAll('.function-btn');
+  const labelText = document.getElementById('labelText');
+  const generateBtnText = document.getElementById('generateBtnText');
+  const resultTitle = document.getElementById('resultTitle');
+  const loadingText = document.getElementById('loadingText');
 
+  let currentFunction = 'outline';
+
+  functionButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      functionButtons.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentFunction = btn.dataset.function;
+      
+      if (currentFunction === 'outline') {
+        labelText.textContent = '學術寫作主題或內容';
+        topicInput.placeholder = '請輸入論文、報告或作業主題，或選取網頁文字後點擊「使用選取文字」';
+        generateBtnText.textContent = '生成寫作大綱';
+        resultTitle.textContent = '生成的寫作大綱';
+        loadingText.textContent = '正在生成寫作大綱...';
+      } else if (currentFunction === 'answer') {
+        labelText.textContent = '問題或內容';
+        topicInput.placeholder = '請輸入您的學術問題，或選取網頁文字後點擊「使用選取文字」';
+        generateBtnText.textContent = '解答問題';
+        resultTitle.textContent = '問題解答';
+        loadingText.textContent = '正在解答問題...';
+      }
+    });
+  });
 
   useSelectedBtn.addEventListener('click', async () => {
     try {
@@ -49,7 +77,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const topic = topicInput.value.trim();
     
     if (!topic) {
-      showError('請輸入學術寫作主題或內容');
+      showError(currentFunction === 'outline' ? '請輸入學術寫作主題或內容' : '請輸入問題或內容');
       return;
     }
 
@@ -59,8 +87,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     generateBtn.disabled = true;
 
     try {
-      const outline = await generateOutline(topic);
-      showResult(outline);
+      let result;
+      if (currentFunction === 'outline') {
+        result = await generateOutline(topic);
+      } else if (currentFunction === 'answer') {
+        result = await answerQuestion(topic);
+      }
+      showResult(result);
     } catch (error) {
       showError(error.message);
     } finally {
@@ -114,6 +147,27 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         resolve(response.outline);
+      });
+    });
+  }
+
+  async function answerQuestion(question) {
+    return new Promise((resolve, reject) => {
+      chrome.runtime.sendMessage({
+        action: 'answerQuestion',
+        prompt: question
+      }, (response) => {
+        if (chrome.runtime.lastError) {
+          reject(new Error(chrome.runtime.lastError.message));
+          return;
+        }
+
+        if (response.error) {
+          reject(new Error(response.error));
+          return;
+        }
+
+        resolve(response.answer);
       });
     });
   }
