@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', async () => {
   const generateBtn = document.getElementById('generateBtn');
+  const regenerateBtn = document.getElementById('regenerateBtn');
   const resultSection = document.getElementById('resultSection');
   const resultContent = document.getElementById('resultContent');
   const copyBtn = document.getElementById('copyBtn');
@@ -7,13 +8,17 @@ document.addEventListener('DOMContentLoaded', async () => {
   const errorDiv = document.getElementById('error');
   const errorText = document.getElementById('errorText');
   const loadingText = document.getElementById('loadingText');
+  const successMessage = document.getElementById('successMessage');
+  const successText = document.getElementById('successText');
 
 
-  generateBtn.addEventListener('click', async () => {
+  async function generateFAQHandler() {
     hideError();
+    hideSuccess();
     hideResult();
     showLoading();
     generateBtn.disabled = true;
+    if (regenerateBtn) regenerateBtn.disabled = true;
 
     try {
       const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
@@ -61,13 +66,21 @@ document.addEventListener('DOMContentLoaded', async () => {
     } finally {
       hideLoading();
       generateBtn.disabled = false;
+      if (regenerateBtn) regenerateBtn.disabled = false;
     }
-  });
+  }
+
+  generateBtn.addEventListener('click', generateFAQHandler);
+
+  if (regenerateBtn) {
+    regenerateBtn.addEventListener('click', generateFAQHandler);
+  }
 
   copyBtn.addEventListener('click', async () => {
     const text = resultContent.textContent;
     try {
       await navigator.clipboard.writeText(text);
+      showSuccess('已複製到剪貼簿');
       const originalIcon = copyBtn.querySelector('.material-icons').textContent;
       copyBtn.querySelector('.material-icons').textContent = 'check';
       setTimeout(() => {
@@ -123,6 +136,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     resultContent.appendChild(container);
     resultSection.style.display = 'block';
+    
+    setTimeout(() => {
+      resultSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, 100);
   }
 
   function showLoading() {
@@ -147,6 +164,22 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   function hideResult() {
     resultSection.style.display = 'none';
+  }
+
+  function showSuccess(message) {
+    hideError();
+    successText.textContent = message;
+    successMessage.style.display = 'flex';
+    setTimeout(() => {
+      successMessage.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, 100);
+    setTimeout(() => {
+      hideSuccess();
+    }, 3000);
+  }
+
+  function hideSuccess() {
+    successMessage.style.display = 'none';
   }
 });
 

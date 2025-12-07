@@ -28,12 +28,22 @@
               <span class="material-icons">check_circle</span>
               <span id="resultTitle">生成的網頁 FAQ</span>
             </h2>
-            <button id="copyBtn" class="icon-button" title="複製">
-              <span class="material-icons">content_copy</span>
-            </button>
+            <div class="result-actions">
+              <button id="regenerateBtn" class="icon-button" title="重新生成">
+                <span class="material-icons">refresh</span>
+              </button>
+              <button id="copyBtn" class="icon-button" title="複製">
+                <span class="material-icons">content_copy</span>
+              </button>
+            </div>
           </div>
           <div id="resultContent" class="result-content"></div>
         </section>
+
+        <div id="successMessage" class="success-message" style="display: none;">
+          <span class="material-icons">check_circle</span>
+          <p id="successText">已複製到剪貼簿</p>
+        </div>
 
         <div id="loading" class="loading" style="display: none;">
           <div class="spinner"></div>
