@@ -36,8 +36,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
-  async function updateRateLimitDisplay() {
+  let lastRemainingCount = 3;
+  let rateLimitUpdateInterval = null;
+
+  async function updateRateLimitDisplay(force = false) {
     const remaining = await getRemainingCount();
+    
+    if (!force && remaining === lastRemainingCount) {
+      return;
+    }
+    
+    lastRemainingCount = remaining;
     rateLimitText.textContent = `剩餘次數：${remaining}/3`;
     
     if (remaining === 0) {
@@ -58,6 +67,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
+  function startRateLimitUpdate() {
+    if (rateLimitUpdateInterval) {
+      clearInterval(rateLimitUpdateInterval);
+    }
+    rateLimitUpdateInterval = setInterval(() => {
+      updateRateLimitDisplay();
+    }, 5000);
+  }
+
   async function checkRateLimit() {
     return new Promise((resolve, reject) => {
       chrome.storage.local.get(['requestTimestamps'], (result) => {
@@ -76,7 +94,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         timestamps.push(now);
         chrome.storage.local.set({ requestTimestamps: timestamps }, () => {
-          updateRateLimitDisplay();
+          updateRateLimitDisplay(true);
           resolve();
         });
       });
@@ -108,7 +126,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
       }
 
-      loadingText.textContent = '正在分析網頁內容...';
+      loadingText.textContent = '步驟 1/3：正在分析網頁內容...';
 
       const results = await chrome.scripting.executeScript({
         target: { tabId: tab.id },
@@ -211,7 +229,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         content = content.substring(0, 8000) + '...';
       }
 
-      loadingText.textContent = '正在生成商品摘要...';
+      loadingText.textContent = '步驟 2/3：正在提取商品資訊...';
+      await new Promise(resolve => setTimeout(resolve, 300));
+      
+      loadingText.textContent = '步驟 3/3：正在生成商品摘要...';
       const result = await generateFAQ(content, url);
       showResult(result);
       await saveHistory(result, url);
@@ -221,7 +242,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       hideLoading();
       generateBtn.disabled = false;
       if (regenerateBtn) regenerateBtn.disabled = false;
-      updateRateLimitDisplay();
+      updateRateLimitDisplay(true);
     }
   }
 
@@ -487,22 +508,96 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
+  const pageInfoCache = new Map();
+  const CACHE_DURATION = 30000;
+
   async function loadCurrentPageInfo() {
     try {
       const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-      if (tab) {
-        pageTitle.textContent = tab.title || '未知網頁';
-        pageUrl.textContent = tab.url ? new URL(tab.url).hostname : '';
-        pageUrl.title = tab.url || '';
+      if (!tab) {
+        showPageInfoError();
+        return;
       }
+
+      const cacheKey = `${tab.id}_${tab.url}`;
+      const cached = pageInfoCache.get(cacheKey);
+      
+      if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+        displayPageInfo(cached.title, cached.url);
+        return;
+      }
+
+      const title = tab.title || '未知網頁';
+      const url = tab.url ? new URL(tab.url).hostname : '';
+      
+      pageInfoCache.set(cacheKey, {
+        title,
+        url,
+        timestamp: Date.now()
+      });
+
+      displayPageInfo(title, url);
     } catch (error) {
+      showPageInfoError();
+    }
+  }
+
+  function displayPageInfo(title, url) {
+    const titleSkeleton = document.getElementById('pageTitleSkeleton');
+    const titleText = document.getElementById('pageTitleText');
+    const urlSkeleton = document.getElementById('pageUrlSkeleton');
+    const urlText = document.getElementById('pageUrlText');
+
+    if (titleSkeleton && titleText) {
+      titleSkeleton.style.display = 'none';
+      titleText.style.display = '';
+      titleText.textContent = title;
+    } else if (pageTitle) {
+      pageTitle.textContent = title;
+    }
+
+    if (urlSkeleton && urlText) {
+      urlSkeleton.style.display = 'none';
+      urlText.style.display = '';
+      urlText.textContent = url;
+      urlText.title = url;
+    } else if (pageUrl) {
+      pageUrl.textContent = url;
+      pageUrl.title = url;
+    }
+  }
+
+  function showPageInfoError() {
+    const titleSkeleton = document.getElementById('pageTitleSkeleton');
+    const titleText = document.getElementById('pageTitleText');
+    
+    if (titleSkeleton && titleText) {
+      titleSkeleton.style.display = 'none';
+      titleText.style.display = '';
+      titleText.textContent = '無法載入網頁資訊';
+    } else if (pageTitle) {
       pageTitle.textContent = '無法載入網頁資訊';
+    }
+    if (pageUrl) {
       pageUrl.textContent = '';
     }
   }
 
+  generateBtn.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !generateBtn.disabled) {
+      e.preventDefault();
+      generateFAQHandler();
+    }
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && e.target === document.body && !generateBtn.disabled) {
+      generateFAQHandler();
+    }
+  });
+
   loadCurrentPageInfo();
-  updateRateLimitDisplay();
-  setInterval(updateRateLimitDisplay, 1000);
+  updateRateLimitDisplay(true);
+  startRateLimitUpdate();
 });
 

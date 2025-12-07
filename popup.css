@@ -147,6 +147,25 @@ main {
   white-space: nowrap;
 }
 
+.skeleton-text {
+  display: inline-block;
+  background: linear-gradient(90deg, #e1bee7 25%, #f3e5f5 50%, #e1bee7 75%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s ease-in-out infinite;
+  border-radius: 4px;
+  color: transparent;
+  min-width: 100px;
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
 .action-section {
   display: flex;
   flex-direction: column;

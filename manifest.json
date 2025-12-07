@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "AcadAI - 商品摘要",
+  "name": "AcadAI",
   "version": "1.0.0",
-  "description": "AcadAI - 自動分析商品網頁內容，生成結構化的商品摘要，包括價格、規格、特色、優缺點等資訊，幫助快速了解商品",
+  "description": "AI 自動幫你整理商品重點 !",
   "permissions": [
     "storage",
     "activeTab",

@@ -40,8 +40,14 @@
           <div class="page-info-content">
             <span class="material-icons">language</span>
             <div class="page-info-text">
-              <div id="pageTitle" class="page-title">載入中...</div>
-              <div id="pageUrl" class="page-url"></div>
+              <div id="pageTitle" class="page-title">
+                <span class="skeleton-text" id="pageTitleSkeleton">載入中...</span>
+                <span id="pageTitleText" style="display: none;"></span>
+              </div>
+              <div id="pageUrl" class="page-url">
+                <span class="skeleton-text" id="pageUrlSkeleton"></span>
+                <span id="pageUrlText" style="display: none;"></span>
+              </div>
             </div>
           </div>
         </div>
