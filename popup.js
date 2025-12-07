@@ -67,23 +67,100 @@ document.addEventListener('DOMContentLoaded', async () => {
         target: { tabId: tab.id },
         func: () => {
           const body = document.body;
-          if (!body) return '';
+          if (!body) return { full: '' };
           
-          return body.innerText || body.textContent || '';
+          const extractText = (selector) => {
+            try {
+              const elements = document.querySelectorAll(selector);
+              let text = '';
+              elements.forEach(el => {
+                const elText = el.innerText || el.textContent || '';
+                if (elText.length > 50 && elText.length < 2000) {
+                  text += elText + '\n\n';
+                }
+              });
+              return text.trim();
+            } catch (e) {
+              return '';
+            }
+          };
+
+          const productSelectors = [
+            '[class*="product"]',
+            '[class*="item"]',
+            '[class*="detail"]',
+            '[class*="info"]',
+            '[id*="product"]',
+            '[id*="item"]',
+            'main',
+            'article'
+          ];
+          
+          let productContent = '';
+          productSelectors.forEach(selector => {
+            const text = extractText(selector);
+            if (text.length > productContent.length) {
+              productContent = text;
+            }
+          });
+          
+          const priceSelectors = [
+            '[class*="price"]',
+            '[class*="cost"]',
+            '[id*="price"]',
+            '[data-price]',
+            '[itemprop="price"]'
+          ];
+          
+          let priceInfo = '';
+          priceSelectors.forEach(selector => {
+            priceInfo += extractText(selector) + '\n';
+          });
+          
+          const reviewSelectors = [
+            '[class*="review"]',
+            '[class*="rating"]',
+            '[class*="comment"]',
+            '[id*="review"]',
+            '[class*="evaluation"]'
+          ];
+          
+          let reviewInfo = '';
+          reviewSelectors.forEach(selector => {
+            reviewInfo += extractText(selector) + '\n';
+          });
+          
+          const fullText = body.innerText || body.textContent || '';
+          
+          return {
+            product: productContent.substring(0, 3000),
+            price: priceInfo.substring(0, 1000),
+            review: reviewInfo.substring(0, 2000),
+            full: fullText
+          };
         }
       });
 
       let content = '';
       if (results && results[0] && results[0].result) {
-        content = results[0].result.trim();
+        const extractedData = results[0].result;
+        if (typeof extractedData === 'object' && extractedData.full) {
+          content = extractedData;
+        } else {
+          content = typeof extractedData === 'string' ? extractedData : extractedData.full || '';
+        }
       }
 
-      if (!content) {
+      if (!content || (typeof content === 'object' && !content.full) || (typeof content === 'string' && !content.trim())) {
         showError('無法取得網頁內容，請確認網頁已完全載入');
         return;
       }
 
-      if (content.length > 8000) {
+      if (typeof content === 'object') {
+        if (content.full && content.full.length > 8000) {
+          content.full = content.full.substring(0, 8000) + '...';
+        }
+      } else if (content.length > 8000) {
         content = content.substring(0, 8000) + '...';
       }
 
