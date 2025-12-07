@@ -10,7 +10,45 @@ document.addEventListener('DOMContentLoaded', async () => {
   const loadingText = document.getElementById('loadingText');
   const successMessage = document.getElementById('successMessage');
   const successText = document.getElementById('successText');
+  const rateLimitInfo = document.getElementById('rateLimitInfo');
+  const rateLimitText = document.getElementById('rateLimitText');
 
+
+  function getRemainingCount() {
+    return new Promise((resolve) => {
+      chrome.storage.local.get(['requestTimestamps'], (result) => {
+        const now = Date.now();
+        const oneMinuteAgo = now - 60000;
+        let timestamps = result.requestTimestamps || [];
+        
+        timestamps = timestamps.filter(timestamp => timestamp > oneMinuteAgo);
+        const remaining = Math.max(0, 3 - timestamps.length);
+        resolve(remaining);
+      });
+    });
+  }
+
+  async function updateRateLimitDisplay() {
+    const remaining = await getRemainingCount();
+    rateLimitText.textContent = `剩餘次數：${remaining}/3`;
+    
+    if (remaining === 0) {
+      rateLimitInfo.classList.add('rate-limit-exceeded');
+      chrome.storage.local.get(['requestTimestamps'], (result) => {
+        const now = Date.now();
+        const oneMinuteAgo = now - 60000;
+        let timestamps = result.requestTimestamps || [];
+        timestamps = timestamps.filter(timestamp => timestamp > oneMinuteAgo);
+        if (timestamps.length > 0) {
+          const oldestRequest = Math.min(...timestamps);
+          const waitTime = Math.ceil((60000 - (now - oldestRequest)) / 1000);
+          rateLimitText.textContent = `剩餘次數：0/3（等待 ${waitTime} 秒）`;
+        }
+      });
+    } else {
+      rateLimitInfo.classList.remove('rate-limit-exceeded');
+    }
+  }
 
   async function checkRateLimit() {
     return new Promise((resolve, reject) => {
@@ -30,6 +68,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         timestamps.push(now);
         chrome.storage.local.set({ requestTimestamps: timestamps }, () => {
+          updateRateLimitDisplay();
           resolve();
         });
       });
@@ -173,6 +212,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       hideLoading();
       generateBtn.disabled = false;
       if (regenerateBtn) regenerateBtn.disabled = false;
+      updateRateLimitDisplay();
     }
   }
 
@@ -293,5 +333,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   function hideSuccess() {
     successMessage.style.display = 'none';
   }
+
+  updateRateLimitDisplay();
+  setInterval(updateRateLimitDisplay, 1000);
 });
 
