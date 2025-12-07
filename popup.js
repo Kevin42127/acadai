@@ -18,6 +18,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   const closeHistoryBtn = document.getElementById('closeHistoryBtn');
   const historyOverlay = document.getElementById('historyOverlay');
   const emptyHistory = document.getElementById('emptyHistory');
+  const pageTitle = document.getElementById('pageTitle');
+  const pageUrl = document.getElementById('pageUrl');
 
 
   function getRemainingCount() {
@@ -485,6 +487,21 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
+  async function loadCurrentPageInfo() {
+    try {
+      const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+      if (tab) {
+        pageTitle.textContent = tab.title || '未知網頁';
+        pageUrl.textContent = tab.url ? new URL(tab.url).hostname : '';
+        pageUrl.title = tab.url || '';
+      }
+    } catch (error) {
+      pageTitle.textContent = '無法載入網頁資訊';
+      pageUrl.textContent = '';
+    }
+  }
+
+  loadCurrentPageInfo();
   updateRateLimitDisplay();
   setInterval(updateRateLimitDisplay, 1000);
 });

@@ -36,14 +36,26 @@
 
     <main>
       <div id="mainContent" class="main-content">
-        <div id="rateLimitInfo" class="rate-limit-info">
-          <span class="material-icons">schedule</span>
-          <span id="rateLimitText">剩餘次數：3/3</span>
+        <div class="page-info-card">
+          <div class="page-info-content">
+            <span class="material-icons">language</span>
+            <div class="page-info-text">
+              <div id="pageTitle" class="page-title">載入中...</div>
+              <div id="pageUrl" class="page-url"></div>
+            </div>
+          </div>
         </div>
-        <button id="generateBtn" class="primary-button">
-          <span class="material-icons">auto_awesome</span>
-          <span id="generateBtnText">生成商品摘要</span>
-        </button>
+
+        <div class="action-section">
+          <button id="generateBtn" class="primary-button">
+            <span class="material-icons">auto_awesome</span>
+            <span id="generateBtnText">生成商品摘要</span>
+          </button>
+          <div id="rateLimitInfo" class="rate-limit-info">
+            <span class="material-icons">schedule</span>
+            <span id="rateLimitText">剩餘次數：3/3</span>
+          </div>
+        </div>
 
         <section id="resultSection" class="result-section" style="display: none;">
           <div class="result-header">
