@@ -169,6 +169,7 @@ main {
   margin: 0 auto;
   padding-left: 24px;
   padding-right: 24px;
+  border-radius: 8px;
 }
 
 .how-to-use h3 {
