@@ -48,7 +48,7 @@ header .material-icons {
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 6px;
+  border-radius: 12px;
   transition: background 0.3s;
 }
 
@@ -69,7 +69,7 @@ main {
 .warning-message {
   background: #fff3cd;
   border: 1px solid #ffc107;
-  border-radius: 8px;
+  border-radius: 16px;
   padding: 20px;
   text-align: center;
   color: #856404;
@@ -91,7 +91,7 @@ main {
   color: white;
   border: none;
   padding: 8px 16px;
-  border-radius: 6px;
+  border-radius: 12px;
   cursor: pointer;
   font-size: 14px;
   transition: background 0.3s;
@@ -138,7 +138,7 @@ main {
   gap: 6px;
   padding: 12px;
   border: 2px solid #e0e0e0;
-  border-radius: 8px;
+  border-radius: 16px;
   background: white;
   cursor: pointer;
   transition: all 0.3s;
@@ -180,7 +180,7 @@ textarea {
   min-height: 120px;
   padding: 12px;
   border: 2px solid #e0e0e0;
-  border-radius: 8px;
+  border-radius: 16px;
   font-size: 14px;
   font-family: inherit;
   resize: vertical;
@@ -207,7 +207,7 @@ textarea:focus {
   gap: 8px;
   padding: 12px 20px;
   border: none;
-  border-radius: 8px;
+  border-radius: 16px;
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
@@ -256,7 +256,7 @@ textarea:focus {
 .result-section {
   background: white;
   border: 2px solid #e0e0e0;
-  border-radius: 8px;
+  border-radius: 16px;
   padding: 16px;
 }
 
@@ -352,7 +352,7 @@ textarea:focus {
 .error-message {
   background: #ffebee;
   border: 1px solid #f44336;
-  border-radius: 8px;
+  border-radius: 16px;
   padding: 16px;
   display: flex;
   align-items: flex-start;
@@ -374,7 +374,7 @@ textarea:focus {
 .success-message {
   background: #e8f5e9;
   border: 1px solid #4caf50;
-  border-radius: 8px;
+  border-radius: 16px;
   padding: 16px;
   display: flex;
   align-items: flex-start;

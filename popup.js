@@ -1,7 +1,6 @@
 document.addEventListener('DOMContentLoaded', async () => {
   const mainContentDiv = document.getElementById('mainContent');
   const topicInput = document.getElementById('topicInput');
-  const useSelectedBtn = document.getElementById('useSelectedBtn');
   const generateBtn = document.getElementById('generateBtn');
   const resultSection = document.getElementById('resultSection');
   const resultContent = document.getElementById('resultContent');
@@ -25,13 +24,13 @@ document.addEventListener('DOMContentLoaded', async () => {
       
       if (currentFunction === 'outline') {
         labelText.textContent = '學術寫作主題或內容';
-        topicInput.placeholder = '請輸入論文、報告或作業主題，或選取網頁文字後點擊「使用選取文字」';
+        topicInput.placeholder = '請輸入論文、報告或作業主題';
         generateBtnText.textContent = '生成寫作大綱';
         resultTitle.textContent = '生成的寫作大綱';
         loadingText.textContent = '正在生成寫作大綱...';
       } else if (currentFunction === 'answer') {
         labelText.textContent = '問題或內容';
-        topicInput.placeholder = '請輸入您的學術問題，或選取網頁文字後點擊「使用選取文字」';
+        topicInput.placeholder = '請輸入您的學術問題';
         generateBtnText.textContent = '解答問題';
         resultTitle.textContent = '問題解答';
         loadingText.textContent = '正在解答問題...';
@@ -39,39 +38,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   });
 
-  useSelectedBtn.addEventListener('click', async () => {
-    try {
-      const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-      
-      if (tab.url.startsWith('chrome://') || tab.url.startsWith('chrome-extension://') || tab.url.startsWith('edge://')) {
-        showError('此頁面不支援文字選取功能，請在一般網頁上使用');
-        return;
-      }
-
-      try {
-        await chrome.scripting.executeScript({
-          target: { tabId: tab.id },
-          files: ['content.js']
-        });
-      } catch (e) {
-      }
-
-      const response = await chrome.tabs.sendMessage(tab.id, { action: 'getSelectedText' });
-      
-      if (response && response.text && response.text.trim()) {
-        topicInput.value = response.text;
-        showSuccess('已成功取得選取文字');
-      } else {
-        showError('請先在網頁上選取文字，然後再點擊此按鈕');
-      }
-    } catch (error) {
-      if (error.message.includes('Could not establish connection')) {
-        showError('無法連接到此頁面。請重新整理頁面後再試，或直接在輸入框中輸入內容');
-      } else {
-        showError('無法取得選取文字：' + error.message);
-      }
-    }
-  });
 
   generateBtn.addEventListener('click', async () => {
     const topic = topicInput.value.trim();
@@ -208,7 +174,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   function showError(message) {
     errorText.textContent = message;
     errorDiv.style.display = 'flex';
-    hideSuccess();
     setTimeout(() => {
       errorDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }, 100);
@@ -216,30 +181,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   function hideError() {
     errorDiv.style.display = 'none';
-  }
-
-  function showSuccess(message) {
-    let successDiv = document.getElementById('success');
-    if (!successDiv) {
-      successDiv = document.createElement('div');
-      successDiv.id = 'success';
-      successDiv.className = 'success-message';
-      const inputSection = document.querySelector('.input-section');
-      inputSection.parentNode.insertBefore(successDiv, inputSection.nextSibling);
-    }
-    successDiv.innerHTML = `<span class="material-icons">check_circle</span><p>${message}</p>`;
-    successDiv.style.display = 'flex';
-    hideError();
-    setTimeout(() => {
-      successDiv.style.display = 'none';
-    }, 3000);
-  }
-
-  function hideSuccess() {
-    const successDiv = document.getElementById('success');
-    if (successDiv) {
-      successDiv.style.display = 'none';
-    }
   }
 
   function hideResult() {
