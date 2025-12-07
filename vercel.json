@@ -1,0 +1,8 @@
+{
+  "functions": {
+    "api/generate-outline.js": {
+      "maxDuration": 30
+    }
+  }
+}
+

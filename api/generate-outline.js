@@ -1,0 +1,60 @@
+export default async function handler(req, res) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: '方法不允許' });
+  }
+
+  const { prompt } = req.body;
+
+  if (!prompt || !prompt.trim()) {
+    return res.status(400).json({ error: '請提供學術寫作主題或內容' });
+  }
+
+  const apiKey = process.env.GROQ_API_KEY;
+
+  if (!apiKey) {
+    return res.status(500).json({ error: '伺服器配置錯誤' });
+  }
+
+  try {
+    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: 'llama-3.1-70b-versatile',
+        messages: [
+          {
+            role: 'system',
+            content: '你是一個專業的學術寫作助手，擅長為大學生生成結構清晰、邏輯嚴謹的學術寫作大綱，包括論文、報告、作業等各種學術寫作類型。'
+          },
+          {
+            role: 'user',
+            content: prompt
+          }
+        ],
+        temperature: 0.7,
+        max_tokens: 2000
+      })
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      return res.status(response.status).json({ 
+        error: error.error?.message || 'API 請求失敗' 
+      });
+    }
+
+    const data = await response.json();
+    const outline = data.choices[0].message.content;
+
+    return res.status(200).json({ outline });
+  } catch (error) {
+    console.error('Groq API 錯誤:', error);
+    return res.status(500).json({ 
+      error: '生成寫作大綱失敗：' + error.message 
+    });
+  }
+}
+

@@ -1,0 +1,24 @@
+{
+  "name": "acadai",
+  "version": "1.0.0",
+  "description": "學術寫作助手後端 API",
+  "main": "api/generate-outline.js",
+  "scripts": {
+    "dev": "vercel dev",
+    "deploy": "vercel --prod"
+  },
+  "keywords": [
+    "acadai",
+    "academic",
+    "writing",
+    "assistant",
+    "outline",
+    "generator",
+    "論文",
+    "學術寫作",
+    "ai"
+  ],
+  "author": "",
+  "license": "MIT"
+}
+

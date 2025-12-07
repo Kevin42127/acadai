@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <title>生成圖標</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      text-align: center;
+    }
+    canvas {
+      border: 1px solid #ccc;
+      margin: 10px;
+    }
+    button {
+      padding: 10px 20px;
+      margin: 5px;
+      cursor: pointer;
+      background: #1976d2;
+      color: white;
+      border: none;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body>
+  <h1>生成 Chrome 擴充功能圖標</h1>
+  <p>點擊下方按鈕生成並下載圖標</p>
+  
+  <div>
+    <canvas id="canvas16" width="16" height="16"></canvas>
+    <canvas id="canvas48" width="48" height="48"></canvas>
+    <canvas id="canvas128" width="128" height="128"></canvas>
+  </div>
+  
+  <div>
+    <button onclick="generateIcon(16)">下載 16x16</button>
+    <button onclick="generateIcon(48)">下載 48x48</button>
+    <button onclick="generateIcon(128)">下載 128x128</button>
+  </div>
+
+  <script>
+    function drawIcon(canvas, size) {
+      const ctx = canvas.getContext('2d');
+      const scale = size / 128;
+      
+      ctx.fillStyle = '#1565c0';
+      ctx.beginPath();
+      ctx.roundRect(0, 0, size, size, 20 * scale);
+      ctx.fill();
+      
+      ctx.fillStyle = '#ffffff';
+      ctx.strokeStyle = '#e3f2fd';
+      ctx.lineWidth = Math.max(1 * scale, 1);
+      const barWidth = 64 * scale;
+      const barHeight = Math.max(10 * scale, 2);
+      const spacing = 16 * scale;
+      const startY = 28 * scale;
+      const startX = 28 * scale;
+      
+      for (let i = 0; i < 5; i++) {
+        const width = i === 2 ? 48 * scale : i === 3 ? 56 * scale : i === 4 ? 52 * scale : barWidth;
+        ctx.fillRect(startX, startY + i * spacing, width, barHeight);
+        ctx.strokeRect(startX, startY + i * spacing, width, barHeight);
+      }
+      
+      const circleSize = 18 * scale;
+      const circleX = size - 28 * scale;
+      const circleY = size - 28 * scale;
+      
+      ctx.fillStyle = '#2e7d32';
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = Math.max(2 * scale, 1);
+      ctx.beginPath();
+      ctx.arc(circleX, circleY, circleSize, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+      
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = Math.max(4 * scale, 2);
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.beginPath();
+      ctx.moveTo(circleX - 10 * scale, circleY);
+      ctx.lineTo(circleX - 3 * scale, circleY + 7 * scale);
+      ctx.lineTo(circleX + 10 * scale, circleY - 7 * scale);
+      ctx.stroke();
+    }
+
+    CanvasRenderingContext2D.prototype.roundRect = function(x, y, width, height, radius) {
+      this.beginPath();
+      this.moveTo(x + radius, y);
+      this.lineTo(x + width - radius, y);
+      this.quadraticCurveTo(x + width, y, x + width, y + radius);
+      this.lineTo(x + width, y + height - radius);
+      this.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+      this.lineTo(x + radius, y + height);
+      this.quadraticCurveTo(x, y + height, x, y + height - radius);
+      this.lineTo(x, y + radius);
+      this.quadraticCurveTo(x, y, x + radius, y);
+      this.closePath();
+    };
+
+    const canvas16 = document.getElementById('canvas16');
+    const canvas48 = document.getElementById('canvas48');
+    const canvas128 = document.getElementById('canvas128');
+
+    drawIcon(canvas16, 16);
+    drawIcon(canvas48, 48);
+    drawIcon(canvas128, 128);
+
+    function generateIcon(size) {
+      const canvas = document.getElementById(`canvas${size}`);
+      canvas.toBlob((blob) => {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `icon${size}.png`;
+        a.click();
+        URL.revokeObjectURL(url);
+      });
+    }
+  </script>
+</body>
+</html>
+
