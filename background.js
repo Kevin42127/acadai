@@ -1,4 +1,4 @@
-const API_BASE_URL = 'https://your-vercel-app.vercel.app';
+const API_BASE_URL = 'https://acadaiwrite.vercel.app';
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === 'generateOutline') {

@@ -48,13 +48,15 @@ vercel --prod
 
 ## 更新擴充功能設定
 
-部署完成後，您會獲得一個 Vercel URL，例如：`https://your-app.vercel.app`
+部署完成後，您會獲得一個 Vercel URL，例如：`https://acadaiwrite.vercel.app`
 
 1. 開啟 `background.js`
 2. 將 `API_BASE_URL` 更新為您的 Vercel URL：
 ```javascript
-const API_BASE_URL = 'https://your-app.vercel.app';
+const API_BASE_URL = 'https://acadaiwrite.vercel.app';
 ```
+
+**注意**：目前已經設定為 `https://acadaiwrite.vercel.app`，無需再次修改。
 
 3. 更新 `manifest.json` 中的 `host_permissions`（如果需要）
 
@@ -69,7 +71,7 @@ const API_BASE_URL = 'https://your-app.vercel.app';
 部署後，可以使用以下方式測試：
 
 ```bash
-curl -X POST https://your-app.vercel.app/api/generate-outline \
+curl -X POST https://acadaiwrite.vercel.app/api/generate-outline \
   -H "Content-Type: application/json" \
   -d '{"prompt":"人工智慧的發展與應用"}'
 ```

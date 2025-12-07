@@ -27,12 +27,14 @@ Chrome 擴充功能，使用 AI 協助大學生進行學術寫作，包含論文
 
 ### 2. 設定擴充功能
 
-1. 部署完成後，取得您的 Vercel URL（例如：`https://your-app.vercel.app`）
+1. 部署完成後，取得您的 Vercel URL（例如：`https://acadaiwrite.vercel.app`）
 2. 開啟 `background.js`
 3. 將 `API_BASE_URL` 更新為您的 Vercel URL：
 ```javascript
-const API_BASE_URL = 'https://your-app.vercel.app';
+const API_BASE_URL = 'https://acadaiwrite.vercel.app';
 ```
+
+**注意**：目前已經設定為 `https://acadaiwrite.vercel.app`，無需再次修改。
 
 ### 3. 載入擴充功能
 
