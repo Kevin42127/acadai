@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "AcadAI - 網頁 FAQ 生成器",
+  "name": "AcadAI - 商品摘要",
   "version": "1.0.0",
-  "description": "AcadAI - 自動分析網頁內容並生成常見問題（FAQ）列表，幫助快速理解網頁重點",
+  "description": "AcadAI - 自動分析商品網頁內容，生成結構化的商品摘要，包括價格、規格、特色、優缺點等資訊，幫助快速了解商品",
   "permissions": [
     "storage",
     "activeTab",

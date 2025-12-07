@@ -12,10 +12,42 @@ document.addEventListener('DOMContentLoaded', async () => {
   const successText = document.getElementById('successText');
 
 
+  async function checkRateLimit() {
+    return new Promise((resolve, reject) => {
+      chrome.storage.local.get(['requestTimestamps'], (result) => {
+        const now = Date.now();
+        const oneMinuteAgo = now - 60000;
+        let timestamps = result.requestTimestamps || [];
+        
+        timestamps = timestamps.filter(timestamp => timestamp > oneMinuteAgo);
+        
+        if (timestamps.length >= 3) {
+          const oldestRequest = Math.min(...timestamps);
+          const waitTime = Math.ceil((60000 - (now - oldestRequest)) / 1000);
+          reject(new Error(`每分鐘最多生成3次，請等待 ${waitTime} 秒後再試`));
+          return;
+        }
+        
+        timestamps.push(now);
+        chrome.storage.local.set({ requestTimestamps: timestamps }, () => {
+          resolve();
+        });
+      });
+    });
+  }
+
   async function generateFAQHandler() {
     hideError();
     hideSuccess();
     hideResult();
+    
+    try {
+      await checkRateLimit();
+    } catch (error) {
+      showError(error.message);
+      return;
+    }
+    
     showLoading();
     generateBtn.disabled = true;
     if (regenerateBtn) regenerateBtn.disabled = true;
@@ -37,9 +69,6 @@ document.addEventListener('DOMContentLoaded', async () => {
           const body = document.body;
           if (!body) return '';
           
-          const scripts = body.querySelectorAll('script, style, nav, header, footer, aside');
-          scripts.forEach(el => el.remove());
-          
           return body.innerText || body.textContent || '';
         }
       });
@@ -58,11 +87,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         content = content.substring(0, 8000) + '...';
       }
 
-      loadingText.textContent = '正在生成 FAQ...';
+      loadingText.textContent = '正在生成商品摘要...';
       const result = await generateFAQ(content, url);
       showResult(result);
     } catch (error) {
-      showError('生成 FAQ 失敗：' + error.message);
+      showError('生成商品摘要失敗：' + error.message);
     } finally {
       hideLoading();
       generateBtn.disabled = false;
@@ -113,10 +142,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
-  function showResult(outline) {
+  function showResult(summary) {
     resultContent.innerHTML = '';
     
-    const lines = outline.split('\n');
+    const lines = summary.split('\n');
     const container = document.createElement('div');
     
     lines.forEach(line => {
@@ -128,6 +157,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         const h4 = document.createElement('h4');
         h4.textContent = line.replace('### ', '');
         container.appendChild(h4);
+      } else if (line.trim().startsWith('- ') || line.trim().startsWith('• ')) {
+        const li = document.createElement('div');
+        li.style.marginLeft = '16px';
+        li.style.marginBottom = '6px';
+        li.textContent = line.trim().replace(/^[-•]\s*/, '');
+        container.appendChild(li);
       } else {
         const textNode = document.createTextNode(line + '\n');
         container.appendChild(textNode);

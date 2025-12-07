@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AcadAI - 網頁 FAQ 生成器</title>
+  <title>AcadAI - 商品摘要</title>
   <link rel="stylesheet" href="popup.css">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
@@ -19,14 +19,14 @@
       <div id="mainContent" class="main-content">
         <button id="generateBtn" class="primary-button">
           <span class="material-icons">auto_awesome</span>
-          <span id="generateBtnText">生成網頁 FAQ</span>
+          <span id="generateBtnText">生成商品摘要</span>
         </button>
 
         <section id="resultSection" class="result-section" style="display: none;">
           <div class="result-header">
             <h2>
               <span class="material-icons">check_circle</span>
-              <span id="resultTitle">生成的網頁 FAQ</span>
+              <span id="resultTitle">商品摘要</span>
             </h2>
             <div class="result-actions">
               <button id="regenerateBtn" class="icon-button" title="重新生成">
@@ -47,7 +47,7 @@
 
         <div id="loading" class="loading" style="display: none;">
           <div class="spinner"></div>
-          <p id="loadingText">正在分析網頁內容並生成 FAQ...</p>
+          <p id="loadingText">正在分析網頁內容並生成商品摘要...</p>
         </div>
 
         <div id="error" class="error-message" style="display: none;">

@@ -64,7 +64,7 @@ async function generateFAQ(content, url) {
     const data = await response.json();
     return data.faq;
   } catch (error) {
-    throw new Error('生成 FAQ 失敗：' + error.message);
+    throw new Error('生成商品摘要失敗：' + error.message);
   }
 }
 
