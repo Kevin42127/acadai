@@ -119,7 +119,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   function showResult(outline) {
-    resultContent.textContent = '';
+    resultContent.innerHTML = '';
     
     const lines = outline.split('\n');
     const container = document.createElement('div');
@@ -133,18 +133,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         const h4 = document.createElement('h4');
         h4.textContent = line.replace('### ', '');
         container.appendChild(h4);
-      } else if (line.trim().startsWith('- ') || line.trim().startsWith('* ')) {
-        const li = document.createElement('li');
-        li.textContent = line.trim().substring(2);
-        if (!container.lastElementChild || container.lastElementChild.tagName !== 'UL') {
-          const ul = document.createElement('ul');
-          container.appendChild(ul);
-        }
-        container.lastElementChild.appendChild(li);
-      } else if (line.trim()) {
-        const p = document.createElement('p');
-        p.textContent = line.trim();
-        container.appendChild(p);
+      } else {
+        const textNode = document.createTextNode(line + '\n');
+        container.appendChild(textNode);
       }
     });
     
