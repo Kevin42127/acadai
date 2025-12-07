@@ -151,7 +151,7 @@ footer {
   margin: 0 auto;
   padding: 0 48px;
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
 }
 
