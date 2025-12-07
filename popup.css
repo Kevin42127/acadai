@@ -21,9 +21,9 @@ body {
 header {
   background: linear-gradient(135deg, #6a1b9a 0%, #8e24aa 50%, #ab47bc 100%);
   color: white;
-  padding: 20px;
+  padding: 20px 24px;
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
   box-shadow: 0 2px 8px rgba(106, 27, 154, 0.3);
 }
@@ -34,6 +34,13 @@ header h1 {
   display: flex;
   align-items: center;
   gap: 8px;
+}
+
+.header-logo {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  display: block;
 }
 
 header .material-icons {
