@@ -1,21 +1,10 @@
 const API_BASE_URL = 'https://acadaiwrite.vercel.app';
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  if (request.action === 'generateOutline') {
-    generateOutline(request.prompt)
-      .then(outline => {
-        sendResponse({ outline: outline });
-      })
-      .catch(error => {
-        sendResponse({ error: error.message });
-      });
-    return true;
-  }
-  
-  if (request.action === 'answerQuestion') {
-    answerQuestion(request.prompt)
-      .then(answer => {
-        sendResponse({ answer: answer });
+  if (request.action === 'generateFAQ') {
+    generateFAQ(request.content, request.url)
+      .then(faq => {
+        sendResponse({ faq: faq });
       })
       .catch(error => {
         sendResponse({ error: error.message });
@@ -24,14 +13,14 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   }
 });
 
-async function generateOutline(prompt) {
+async function generateFAQ(content, url) {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/generate-outline`, {
+    const response = await fetch(`${API_BASE_URL}/api/generate-faq`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ prompt })
+      body: JSON.stringify({ content, url })
     });
 
     if (!response.ok) {
@@ -40,31 +29,9 @@ async function generateOutline(prompt) {
     }
 
     const data = await response.json();
-    return data.outline;
+    return data.faq;
   } catch (error) {
-    throw new Error('生成寫作大綱失敗：' + error.message);
-  }
-}
-
-async function answerQuestion(prompt) {
-  try {
-    const response = await fetch(`${API_BASE_URL}/api/answer-question`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ prompt })
-    });
-
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error || 'API 請求失敗');
-    }
-
-    const data = await response.json();
-    return data.answer;
-  } catch (error) {
-    throw new Error('解答問題失敗：' + error.message);
+    throw new Error('生成 FAQ 失敗：' + error.message);
   }
 }
 

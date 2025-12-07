@@ -14,51 +14,61 @@ document.addEventListener('DOMContentLoaded', async () => {
   const resultTitle = document.getElementById('resultTitle');
   const loadingText = document.getElementById('loadingText');
 
-  let currentFunction = 'outline';
-
-  functionButtons.forEach(btn => {
-    btn.addEventListener('click', () => {
-      functionButtons.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      currentFunction = btn.dataset.function;
-      
-      if (currentFunction === 'outline') {
-        labelText.textContent = '學術寫作主題或內容';
-        topicInput.placeholder = '請輸入論文、報告或作業主題';
-        generateBtnText.textContent = '生成寫作大綱';
-        resultTitle.textContent = '生成的寫作大綱';
-        loadingText.textContent = '正在生成寫作大綱...';
-      } else if (currentFunction === 'answer') {
-        labelText.textContent = '問題或內容';
-        topicInput.placeholder = '請輸入您的學術問題';
-        generateBtnText.textContent = '解答問題';
-        resultTitle.textContent = '問題解答';
-        loadingText.textContent = '正在解答問題...';
-      }
-    });
-  });
+  let currentFunction = 'faq';
 
 
   generateBtn.addEventListener('click', async () => {
-    const topic = topicInput.value.trim();
-    
-    if (!topic) {
-      showError(currentFunction === 'outline' ? '請輸入學術寫作主題或內容' : '請輸入問題或內容');
-      return;
-    }
-
     hideError();
     hideResult();
     showLoading();
     generateBtn.disabled = true;
 
     try {
-      let result;
-      if (currentFunction === 'outline') {
-        result = await generateOutline(topic);
-      } else if (currentFunction === 'answer') {
-        result = await answerQuestion(topic);
+      let content = topicInput.value.trim();
+      let url = '';
+
+      if (!content) {
+        try {
+          const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+          url = tab.url;
+          
+          if (tab.url.startsWith('chrome://') || tab.url.startsWith('chrome-extension://') || tab.url.startsWith('edge://')) {
+            showError('此頁面不支援內容分析，請在一般網頁上使用，或手動輸入內容');
+            return;
+          }
+
+          const results = await chrome.scripting.executeScript({
+            target: { tabId: tab.id },
+            func: () => {
+              const body = document.body;
+              if (!body) return '';
+              
+              const scripts = body.querySelectorAll('script, style, nav, header, footer, aside');
+              scripts.forEach(el => el.remove());
+              
+              return body.innerText || body.textContent || '';
+            }
+          });
+
+          if (results && results[0] && results[0].result) {
+            content = results[0].result.trim();
+          }
+
+          if (!content) {
+            showError('無法取得網頁內容，請手動輸入內容');
+            return;
+          }
+
+          if (content.length > 5000) {
+            content = content.substring(0, 5000) + '...';
+          }
+        } catch (error) {
+          showError('無法取得網頁內容：' + error.message + '。請手動輸入內容');
+          return;
+        }
       }
+
+      const result = await generateFAQ(content, url);
       showResult(result);
     } catch (error) {
       showError(error.message);
@@ -82,25 +92,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   });
 
-  async function generateOutline(topic) {
-    const prompt = `請為以下學術寫作主題生成一個結構化的大綱。這個大綱可以用於論文、報告、作業等各種學術寫作。大綱應該包含：
-1. 標題
-2. 摘要/前言
-3. 主要章節（至少3-5個章節）
-4. 每個章節下的子章節或要點
-5. 結論
-
-請使用清晰的層次結構，使用標題和列表來組織內容。格式要求：
-- 使用 ## 表示主要章節
-- 使用 ### 表示子章節
-- 使用列表表示具體要點
-
-學術寫作主題：${topic}`;
-
+  async function generateFAQ(content, url) {
     return new Promise((resolve, reject) => {
       chrome.runtime.sendMessage({
-        action: 'generateOutline',
-        prompt: prompt
+        action: 'generateFAQ',
+        content: content,
+        url: url
       }, (response) => {
         if (chrome.runtime.lastError) {
           reject(new Error(chrome.runtime.lastError.message));
@@ -112,28 +109,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           return;
         }
 
-        resolve(response.outline);
-      });
-    });
-  }
-
-  async function answerQuestion(question) {
-    return new Promise((resolve, reject) => {
-      chrome.runtime.sendMessage({
-        action: 'answerQuestion',
-        prompt: question
-      }, (response) => {
-        if (chrome.runtime.lastError) {
-          reject(new Error(chrome.runtime.lastError.message));
-          return;
-        }
-
-        if (response.error) {
-          reject(new Error(response.error));
-          return;
-        }
-
-        resolve(response.answer);
+        resolve(response.faq);
       });
     });
   }
