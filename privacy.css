@@ -25,9 +25,9 @@ header {
 }
 
 .header-container {
-  max-width: 1200px;
+  width: 100%;
   margin: 0 auto;
-  padding: 0 24px;
+  padding: 0 48px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -75,9 +75,9 @@ main {
 }
 
 .container {
-  max-width: 900px;
+  width: 100%;
   margin: 0 auto;
-  padding: 0 24px;
+  padding: 0 48px;
 }
 
 h1 {
@@ -147,9 +147,9 @@ footer {
 }
 
 .footer-content {
-  max-width: 1200px;
+  width: 100%;
   margin: 0 auto;
-  padding: 0 24px;
+  padding: 0 48px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -176,6 +176,7 @@ footer {
   .header-container {
     flex-direction: column;
     gap: 16px;
+    padding: 0 24px;
   }
 
   nav {
@@ -183,7 +184,11 @@ footer {
   }
 
   .container {
-    padding: 0 16px;
+    padding: 0 24px;
+  }
+
+  .footer-content {
+    padding: 0 24px;
   }
 
   section {
