@@ -5,7 +5,11 @@
   "main": "api/generate-outline.js",
   "scripts": {
     "dev": "vercel dev",
-    "deploy": "vercel --prod"
+    "deploy": "vercel --prod",
+    "package": "node package-extension.js"
+  },
+  "devDependencies": {
+    "archiver": "^7.0.1"
   },
   "keywords": [
     "acadai",
