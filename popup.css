@@ -233,7 +233,7 @@ textarea:focus {
   gap: 8px;
   padding: 12px 20px;
   border: none;
-  border-radius: 16px;
+  border-radius: 24px;
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
