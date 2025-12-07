@@ -12,6 +12,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   const successText = document.getElementById('successText');
   const rateLimitInfo = document.getElementById('rateLimitInfo');
   const rateLimitText = document.getElementById('rateLimitText');
+  const historyBtn = document.getElementById('historyBtn');
+  const historySidebar = document.getElementById('historySidebar');
+  const historyList = document.getElementById('historyList');
+  const closeHistoryBtn = document.getElementById('closeHistoryBtn');
+  const historyOverlay = document.getElementById('historyOverlay');
+  const emptyHistory = document.getElementById('emptyHistory');
 
 
   function getRemainingCount() {
@@ -206,6 +212,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       loadingText.textContent = '正在生成商品摘要...';
       const result = await generateFAQ(content, url);
       showResult(result);
+      await saveHistory(result, url);
     } catch (error) {
       showError('生成商品摘要失敗：' + error.message);
     } finally {
@@ -332,6 +339,150 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   function hideSuccess() {
     successMessage.style.display = 'none';
+  }
+
+  historyBtn.addEventListener('click', () => {
+    showHistory();
+  });
+
+  closeHistoryBtn.addEventListener('click', () => {
+    hideHistory();
+  });
+
+  historyOverlay.addEventListener('click', () => {
+    hideHistory();
+  });
+
+  async function saveHistory(summary, url) {
+    return new Promise((resolve) => {
+      chrome.storage.local.get(['history'], (result) => {
+        let history = result.history || [];
+        const historyItem = {
+          id: Date.now(),
+          summary: summary,
+          url: url || '',
+          timestamp: new Date().toLocaleString('zh-TW'),
+          preview: summary.substring(0, 100).replace(/\n/g, ' ') + '...'
+        };
+        
+        history.unshift(historyItem);
+        
+        if (history.length > 50) {
+          history = history.slice(0, 50);
+        }
+        
+        chrome.storage.local.set({ history: history }, () => {
+          resolve();
+        });
+      });
+    });
+  }
+
+  async function loadHistory() {
+    return new Promise((resolve) => {
+      chrome.storage.local.get(['history'], (result) => {
+        resolve(result.history || []);
+      });
+    });
+  }
+
+  async function showHistory() {
+    const history = await loadHistory();
+    historyList.innerHTML = '';
+    
+    if (history.length === 0) {
+      emptyHistory.style.display = 'flex';
+      historyList.style.display = 'none';
+    } else {
+      emptyHistory.style.display = 'none';
+      historyList.style.display = 'block';
+      
+      history.forEach(item => {
+        const historyItem = document.createElement('div');
+        historyItem.className = 'history-item';
+        
+        const itemContent = document.createElement('div');
+        itemContent.className = 'history-item-content';
+        
+        const itemHeader = document.createElement('div');
+        itemHeader.className = 'history-item-header';
+        
+        const itemUrl = document.createElement('div');
+        itemUrl.className = 'history-item-url';
+        itemUrl.textContent = item.url || '當前網頁';
+        itemUrl.title = item.url || '當前網頁';
+        
+        const itemTime = document.createElement('div');
+        itemTime.className = 'history-item-time';
+        itemTime.textContent = item.timestamp;
+        
+        itemHeader.appendChild(itemUrl);
+        itemHeader.appendChild(itemTime);
+        
+        const itemPreview = document.createElement('div');
+        itemPreview.className = 'history-item-preview';
+        itemPreview.textContent = item.preview;
+        
+        itemContent.appendChild(itemHeader);
+        itemContent.appendChild(itemPreview);
+        
+        const itemActions = document.createElement('div');
+        itemActions.className = 'history-item-actions';
+        
+        const loadBtn = document.createElement('button');
+        loadBtn.className = 'history-action-btn';
+        loadBtn.title = '載入';
+        loadBtn.innerHTML = '<span class="material-icons">visibility</span>';
+        loadBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          loadHistoryItem(item);
+        });
+        
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'history-action-btn';
+        deleteBtn.title = '刪除';
+        deleteBtn.innerHTML = '<span class="material-icons">delete</span>';
+        deleteBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          deleteHistoryItem(item.id);
+        });
+        
+        itemActions.appendChild(loadBtn);
+        itemActions.appendChild(deleteBtn);
+        
+        historyItem.appendChild(itemContent);
+        historyItem.appendChild(itemActions);
+        
+        historyList.appendChild(historyItem);
+      });
+    }
+    
+    historySidebar.style.display = 'block';
+    historyOverlay.style.display = 'block';
+  }
+
+  function hideHistory() {
+    historySidebar.style.display = 'none';
+    historyOverlay.style.display = 'none';
+  }
+
+  function loadHistoryItem(item) {
+    showResult(item.summary);
+    hideHistory();
+    resultSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  async function deleteHistoryItem(id) {
+    return new Promise((resolve) => {
+      chrome.storage.local.get(['history'], (result) => {
+        let history = result.history || [];
+        history = history.filter(item => item.id !== id);
+        chrome.storage.local.set({ history: history }, () => {
+          showHistory();
+          resolve();
+        });
+      });
+    });
   }
 
   updateRateLimitDisplay();

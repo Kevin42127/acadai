@@ -14,7 +14,25 @@
         <img src="icons/logo.png" alt="AcadAI" class="header-logo">
         AcadAI
       </h1>
+      <button id="historyBtn" class="header-button" title="歷史紀錄">
+        <span class="material-icons">history</span>
+      </button>
     </header>
+
+    <div id="historySidebar" class="history-sidebar" style="display: none;">
+      <div class="history-header">
+        <h2>歷史紀錄</h2>
+        <button id="closeHistoryBtn" class="icon-button" title="關閉">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+      <div id="historyList" class="history-list"></div>
+      <div id="emptyHistory" class="empty-history" style="display: none;">
+        <span class="material-icons">inbox</span>
+        <p>尚無歷史紀錄</p>
+      </div>
+    </div>
+    <div id="historyOverlay" class="history-overlay" style="display: none;"></div>
 
     <main>
       <div id="mainContent" class="main-content">
