@@ -360,7 +360,7 @@ textarea:focus {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft JhengHei', sans-serif;
   max-height: 400px;
   overflow-y: auto;
-  padding-right: 8px;
+  padding: 8px 8px 8px 0;
 }
 
 .result-content::-webkit-scrollbar {
@@ -384,8 +384,8 @@ textarea:focus {
 .result-content h3 {
   font-size: 16px;
   font-weight: 600;
-  margin-top: 16px;
-  margin-bottom: 8px;
+  margin-top: 24px;
+  margin-bottom: 12px;
   background: linear-gradient(135deg, #9c27b0 0%, #7b1fa2 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -394,28 +394,36 @@ textarea:focus {
 
 .result-content h3:first-child {
   margin-top: 0;
+  margin-bottom: 12px;
 }
 
 .result-content h4 {
   font-size: 14px;
   font-weight: 600;
-  margin-top: 12px;
-  margin-bottom: 6px;
+  margin-top: 16px;
+  margin-bottom: 10px;
   color: #7b1fa2;
   padding-left: 16px;
 }
 
 .result-content ul, .result-content ol {
   margin-left: 24px;
-  margin-bottom: 12px;
+  margin-bottom: 16px;
+  margin-top: 8px;
 }
 
 .result-content li {
-  margin-bottom: 6px;
+  margin-bottom: 10px;
+  line-height: 1.7;
 }
 
 .result-content p {
-  margin-bottom: 12px;
+  margin-bottom: 16px;
+  line-height: 1.8;
+}
+
+.result-content > div {
+  margin-bottom: 8px;
 }
 
 .loading {

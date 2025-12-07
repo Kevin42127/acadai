@@ -307,12 +307,19 @@ document.addEventListener('DOMContentLoaded', async () => {
       } else if (line.trim().startsWith('- ') || line.trim().startsWith('• ')) {
         const li = document.createElement('div');
         li.style.marginLeft = '16px';
-        li.style.marginBottom = '6px';
+        li.style.marginBottom = '10px';
+        li.style.lineHeight = '1.7';
         li.textContent = line.trim().replace(/^[-•]\s*/, '');
         container.appendChild(li);
+      } else if (line.trim()) {
+        const p = document.createElement('p');
+        p.style.marginBottom = '12px';
+        p.style.lineHeight = '1.8';
+        p.textContent = line.trim();
+        container.appendChild(p);
       } else {
-        const textNode = document.createTextNode(line + '\n');
-        container.appendChild(textNode);
+        const br = document.createElement('br');
+        container.appendChild(br);
       }
     });
     
