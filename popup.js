@@ -63,8 +63,22 @@ document.addEventListener('DOMContentLoaded', async () => {
           showError('無法取得網頁內容：' + error.message + '。請手動輸入內容');
           return;
         }
+      } else {
+        const urlPattern = /^https?:\/\/.+/i;
+        if (urlPattern.test(content)) {
+          loadingText.textContent = '正在抓取網頁內容...';
+          try {
+            const fetchResult = await fetchContent(content);
+            content = fetchResult.content;
+            url = fetchResult.url;
+          } catch (error) {
+            showError('無法抓取網址內容：' + error.message);
+            return;
+          }
+        }
       }
 
+      loadingText.textContent = '正在分析網頁內容並生成 FAQ...';
       const result = await generateFAQ(content, url);
       showResult(result);
     } catch (error) {
@@ -88,6 +102,27 @@ document.addEventListener('DOMContentLoaded', async () => {
       showError('複製失敗：' + error.message);
     }
   });
+
+  async function fetchContent(url) {
+    return new Promise((resolve, reject) => {
+      chrome.runtime.sendMessage({
+        action: 'fetchContent',
+        url: url
+      }, (response) => {
+        if (chrome.runtime.lastError) {
+          reject(new Error(chrome.runtime.lastError.message));
+          return;
+        }
+
+        if (response.error) {
+          reject(new Error(response.error));
+          return;
+        }
+
+        resolve(response);
+      });
+    });
+  }
 
   async function generateFAQ(content, url) {
     return new Promise((resolve, reject) => {
