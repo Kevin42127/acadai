@@ -8,13 +8,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   const loadingDiv = document.getElementById('loading');
   const errorDiv = document.getElementById('error');
   const errorText = document.getElementById('errorText');
-  const functionButtons = document.querySelectorAll('.function-btn');
   const labelText = document.getElementById('labelText');
   const generateBtnText = document.getElementById('generateBtnText');
   const resultTitle = document.getElementById('resultTitle');
   const loadingText = document.getElementById('loadingText');
-
-  let currentFunction = 'faq';
 
 
   generateBtn.addEventListener('click', async () => {
